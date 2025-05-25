@@ -1,17 +1,20 @@
 // src/scripts/pages/bookmark/bookmark-page.js
 import {
-  generateStoriesListEmptyTemplate,
-  generateStoriesListErrorTemplate,
-  generateLoaderAbsoluteTemplate,
-  generateStoryItemTemplate,
+  generateStoriesListEmptyTemplate, //
+  generateStoriesListErrorTemplate, //
+  generateLoaderAbsoluteTemplate, //
+  generateStoryItemTemplate, //
 } from '../../templates';
-import { storyMapper } from '../../data/api-mapper';
-import Map from '../../utils/map'; // Import Map class
+import { storyMapper } from '../../data/api-mapper'; //
+import Map from '../../utils/map'; //
+// Impor fungsi IndexedDB
+import { getAllStoriesFromDB } from '../../data/indexeddb-manager';
 
 export default class BookmarkPage {
-  #map = null; // Properti untuk menyimpan instance peta
+  #map = null; //
 
   async render() {
+    // <--- METHOD RENDER ADA DI SINI
     return `
       <section>
         <div class="stories-list__map__container">
@@ -32,38 +35,12 @@ export default class BookmarkPage {
   }
 
   async afterRender() {
-    this.showLoading();
-    try {
-      await this.initialMap(); // Panggil initialMap di sini untuk BookmarkPage
-
-      const bookmarkedStoriesRaw = JSON.parse(localStorage.getItem('bookmarkedStories')) || [];
-      const bookmarkedStories = await Promise.all(
-        bookmarkedStoriesRaw.map(async (story) => {
-          // Karena data yang disimpan adalah raw story dari API,
-          // kita perlu me-map-nya lagi dengan storyMapper untuk mendapatkan placeName
-          if (typeof story.lat === 'number' && typeof story.lon === 'number') {
-            return await storyMapper(story);
-          }
-          return {
-            ...story,
-            location: {
-              latitude: null,
-              longitude: null,
-              placeName: 'Lokasi tidak tersedia', // Pesan default jika lokasi tidak ada
-            },
-          };
-        }),
-      );
-
-      this.populateStoriesList(bookmarkedStories);
-    } catch (error) {
-      console.error('Error loading bookmarked stories:', error);
-      this.populateStoriesListError('Terjadi kesalahan saat memuat story tersimpan.');
-    } finally {
-      this.hideLoading();
-    }
+    // ... (kode afterRender Anda) ...
   }
 
+  // ... (method lainnya seperti populateStoriesList, initialMap, showLoading, dll. ada di sini) ...
+  // Pastikan method-method ini juga terdefinisi dengan benar di file Anda.
+  // Misalnya:
   populateStoriesList(stories) {
     if (stories.length === 0) {
       this.populateStoriesListEmpty();
@@ -71,15 +48,17 @@ export default class BookmarkPage {
     }
 
     const html = stories.reduce((accumulator, story) => {
-      // Pastikan #map sudah terinisialisasi dan koordinat berupa angka sebelum menambahkan marker
       if (
         this.#map &&
+        story.location &&
         typeof story.location.latitude === 'number' &&
         typeof story.location.longitude === 'number'
       ) {
         const coordinate = [story.location.latitude, story.location.longitude];
         const markerOptions = { alt: story.description };
-        const popupOptions = { content: story.description };
+        // Pastikan story.description ada, atau gunakan fallback
+        const popupContent = story.description || 'Story';
+        const popupOptions = { content: popupContent };
         this.#map.addMarker(coordinate, markerOptions, popupOptions);
       }
 
@@ -90,47 +69,63 @@ export default class BookmarkPage {
           description: story.description,
           photoUrl: story.photoUrl,
           createdAt: story.createdAt,
-          location: story.location, // Ini akan menampilkan 'Lokasi tidak tersedia' jika placeName tidak ada
+          location: story.location,
         }),
       );
     }, '');
 
-    document.getElementById('stories-list').innerHTML = `
-      <div class="stories-list">${html}</div>
-    `;
+    const storiesListElement = document.getElementById('stories-list');
+    if (storiesListElement) {
+      storiesListElement.innerHTML = `<div class="stories-list">${html}</div>`;
+    }
   }
 
   populateStoriesListEmpty() {
-    document.getElementById('stories-list').innerHTML = generateStoriesListEmptyTemplate();
+    const storiesListElement = document.getElementById('stories-list');
+    if (storiesListElement) {
+      storiesListElement.innerHTML = generateStoriesListEmptyTemplate();
+    }
   }
 
   populateStoriesListError(message) {
-    document.getElementById('stories-list').innerHTML = generateStoriesListErrorTemplate(message);
+    const storiesListElement = document.getElementById('stories-list');
+    if (storiesListElement) {
+      storiesListElement.innerHTML = generateStoriesListErrorTemplate(message);
+    }
   }
 
   async initialMap() {
-    // Fungsi ini dipanggil dari afterRender untuk BookmarkPage
-    // untuk menginisialisasi peta.
     this.#map = await Map.build('#map', {
       zoom: 10,
-      locate: true, // Akan mencoba menemukan lokasi pengguna sebagai center awal
+      locate: true,
     });
   }
 
   showMapLoading() {
-    document.getElementById('map-loading-container').innerHTML = generateLoaderAbsoluteTemplate();
+    const mapLoadingContainer = document.getElementById('map-loading-container');
+    if (mapLoadingContainer) {
+      mapLoadingContainer.innerHTML = generateLoaderAbsoluteTemplate();
+    }
   }
 
   hideMapLoading() {
-    document.getElementById('map-loading-container').innerHTML = '';
+    const mapLoadingContainer = document.getElementById('map-loading-container');
+    if (mapLoadingContainer) {
+      mapLoadingContainer.innerHTML = '';
+    }
   }
 
   showLoading() {
-    document.getElementById('stories-list-loading-container').innerHTML =
-      generateLoaderAbsoluteTemplate();
+    const loadingContainer = document.getElementById('stories-list-loading-container');
+    if (loadingContainer) {
+      loadingContainer.innerHTML = generateLoaderAbsoluteTemplate();
+    }
   }
 
   hideLoading() {
-    document.getElementById('stories-list-loading-container').innerHTML = '';
+    const loadingContainer = document.getElementById('stories-list-loading-container');
+    if (loadingContainer) {
+      loadingContainer.innerHTML = '';
+    }
   }
 }

@@ -1273,35 +1273,54 @@ footer {
 
 /* ... kode CSS yang sudah ada ... */
 
-/* Tambahkan ini di bagian HEADER atau Navigation */
+/* src/styles/styles.css atau src/styles/responsives.css */
+
+/* ... CSS yang sudah ada ... */
+
+/* Styling untuk grup tombol "Buat Story" dan "Subscribe" */
+.navigation-drawer__navlist li.nav-item-group {
+  display: flex; /* Menggunakan flexbox untuk item di dalamnya */
+  align-items: center; /* Menyelaraskan item secara vertikal */
+  gap: 10px; /* Jarak antar tombol */
+  /* Hapus padding default dari <li> jika ada, agar tombol bisa lebih rapat */
+  padding: 0;
+}
+
+/* Pastikan tombol di dalam grup ini tidak mengambil lebar penuh jika tidak diinginkan */
+.navigation-drawer__navlist li.nav-item-group > .btn,
+.navigation-drawer__navlist li.nav-item-group > span > .btn {
+  /* Anda mungkin perlu menyesuaikan ini tergantung styling .btn Anda */
+  width: auto;
+  flex-grow: 0; /* Agar tombol tidak membesar mengisi ruang flex */
+}
+
+/* Penyesuaian untuk tampilan desktop di responsives.css */
+@media screen and (width > 1000px) {
+  /* ... CSS responsif yang sudah ada ... */
+
+  .navigation-drawer__navlist li.nav-item-group {
+    /* Mungkin tidak perlu styling khusus di sini jika sudah flex di atas,
+       kecuali ingin mengubah gap atau alignment khusus desktop */
+    padding: 0; /* Contoh: memastikan tidak ada padding */
+  }
+
+  /* Jika Anda ingin tombol subscribe/unsubscribe memiliki style yang sama
+     dengan tombol navigasi lainnya di desktop */
+  .navigation-drawer__navlist li.nav-item-group #push-notification-button-container .btn {
+    /* Contoh: sesuaikan padding agar mirip dengan link navigasi lain */
+    padding: 8px 15px; /* Sesuaikan dengan padding tombol "Buat Story" jika perlu */
+    /* Pastikan styling konsisten dengan item navigasi lain di desktop */
+    /* Misalnya, jika item nav lain adalah link, tombol ini mungkin perlu disesuaikan agar terlihat serasi */
+  }
+}
+
+/* Hapus styling untuk #push-notification-tools yang lama jika masih ada di styles.css */
+/* Contoh: */
+
 .navigation-drawer__navlist li.push-notification-tools {
-  /* Atur styling agar tombol subscribe/unsubscribe terlihat di navigasi */
   display: flex;
   align-items: center;
-  justify-content: center; /* Untuk menengahkan tombol di dalam li */
-  padding: 6px 10px; /* Sesuaikan dengan padding item navigasi lainnya jika perlu */
-  /* Margin agar tidak terlalu mepet dengan item lain */
-  margin-right: 10px; /* Contoh, sesuaikan kebutuhan layout Anda */
+  justify-content: center;
+  padding: 6px 10px;
+  margin-right: 10px;
 }
-
-/* Jika Anda ingin tombolnya memiliki style khusus saat tidak login */
-.navigation-drawer__navlist li.push-notification-tools .btn {
-  min-height: 44px;
-  min-width: 44px;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-/* Contoh penyesuaian di desktop, agar tombol tidak terlalu besar */
-@media screen and (width > 1000px) {
-  .navigation-drawer__navlist li.push-notification-tools {
-    padding: 0; /* Hapus padding jika di desktop item nav lain tidak ada padding */
-  }
-  .navigation-drawer__navlist li.push-notification-tools .btn {
-    min-height: auto;
-    min-width: auto;
-    padding: 8px 15px; /* Sesuaikan padding tombol di desktop */
-  }
-}
-
-/* ... sisa kode CSS yang sudah ada ... */

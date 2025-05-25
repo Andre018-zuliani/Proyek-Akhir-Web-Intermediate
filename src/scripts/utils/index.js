@@ -1,3 +1,5 @@
+// src/scripts/utils/index.js
+
 export function sleep(time = 1000) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
@@ -19,20 +21,14 @@ export async function createCarousel(containerElement, options = {}) {
     mouseDrag: true,
     swipeAngle: false,
     speed: 600,
-
     nav: true,
     navPosition: 'bottom',
-
     autoplay: false,
     controls: false,
-
     ...options,
   });
 }
 
-/**
- * Ref: https://stackoverflow.com/questions/18650168/convert-blob-to-base64
- */
 export function convertBlobToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -42,9 +38,6 @@ export function convertBlobToBase64(file) {
   });
 }
 
-/**
- * Ref: https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
- */
 export function convertBase64ToBlob(base64Data, contentType = '', sliceSize = 512) {
   const byteCharacters = atob(base64Data);
   const byteArrays = [];
@@ -77,7 +70,18 @@ export function convertBase64ToUint8Array(base64String) {
 }
 
 export function setupSkipToContent(element, mainContent) {
-  element.addEventListener('click', () => mainContent.focus());
+  if (element && mainContent) {
+    element.addEventListener('click', () => mainContent.focus());
+  } else {
+    if (!element) {
+      console.warn(
+        'setupSkipToContent: skipLinkButton element (target untuk event listener) tidak ditemukan.',
+      );
+    }
+    if (!mainContent) {
+      console.warn('setupSkipToContent: mainContent element (target untuk focus) tidak ditemukan.');
+    }
+  }
 }
 
 export function transitionHelper({ skipTransition = false, updateDOM }) {

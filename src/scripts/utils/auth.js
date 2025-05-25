@@ -38,13 +38,19 @@ export function removeAccessToken() {
 
 const unauthenticatedRoutesOnly = ['/login', '/register'];
 
+// src/scripts/utils/auth.js
+
 export function checkUnauthenticatedRouteOnly(page) {
   const url = getActiveRoute();
   const isLogin = !!getAccessToken();
 
   if (unauthenticatedRoutesOnly.includes(url) && isLogin) {
     location.hash = '/';
-    return null;
+    // Kembalikan objek dengan method render & afterRender, bukan null
+    return {
+      render: async () => '', // Tidak merender apa-apa karena redirect
+      afterRender: async () => {},
+    };
   }
 
   return page;

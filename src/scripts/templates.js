@@ -20,7 +20,6 @@ export function generateMainNavigationListTemplate() {
   `;
 }
 
-// Hanya ini satu-satunya definisi untuk fungsi ini
 export function generateUnauthenticatedNavigationListTemplate() {
   return `
     <li><a id="login-button" href="#/login">Login</a></li>
@@ -28,15 +27,20 @@ export function generateUnauthenticatedNavigationListTemplate() {
   `;
 }
 
-// Hanya ini satu-satunya definisi untuk fungsi ini
+// HANYA SATU DEFINISI INI:
+// Ini adalah versi yang dimodifikasi agar tombol subscribe/unsubscribe bisa diletakkan di samping "Buat Story"
 export function generateAuthenticatedNavigationListTemplate() {
   return `
-    <li><a id="new-report-button" class="btn new-report-button" href="#/new">Buat Story <i class="fas fa-plus"></i></a></li>
+    <li class="nav-item-group">
+      <a id="new-report-button" class="btn new-report-button" href="#/new">Buat Story <i class="fas fa-plus"></i></a>
+      <span id="push-notification-button-container"></span>
+    </li>
     <li><a id="logout-button" class="logout-button" href="#/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
   `;
 }
 
 export function generateStoriesListEmptyTemplate() {
+  // ... (sisa fungsi tetap sama)
   return `
     <div id="stories-list-empty" class="stories-list__empty">
       <h2>Tidak ada story yang tersedia</h2>
@@ -46,6 +50,7 @@ export function generateStoriesListEmptyTemplate() {
 }
 
 export function generateStoriesListErrorTemplate(message) {
+  // ... (sisa fungsi tetap sama)
   return `
     <div id="stories-list-error" class="stories-list__error">
       <h2>Terjadi kesalahan pengambilan daftar story</h2>
@@ -55,6 +60,7 @@ export function generateStoriesListErrorTemplate(message) {
 }
 
 export function generateStoryDetailErrorTemplate(message) {
+  // ... (sisa fungsi tetap sama)
   return `
     <div id="story-detail-error" class="reports-detail__error">
       <h2>Terjadi kesalahan pengambilan detail story</h2>
@@ -71,6 +77,7 @@ export function generateStoryItemTemplate({
   createdAt,
   location,
 }) {
+  // ... (sisa fungsi tetap sama)
   return `
     <div tabindex="0" class="story-item" data-storyid="${id}">
       <img class="story-item__image" src="${photoUrl}" alt="${description}">
@@ -105,6 +112,7 @@ export function generateStoryDetailTemplate({
   location,
   createdAt,
 }) {
+  // ... (sisa fungsi tetap sama)
   const createdAtFormatted = showFormattedDate(createdAt, 'id-ID');
 
   return `
@@ -168,22 +176,25 @@ export function generateStoryDetailTemplate({
 }
 
 export function generateSubscribeButtonTemplate() {
+  // ... (sisa fungsi tetap sama)
   return `
-    <button id="subscribe-button" class="btn subscribe-button">
+    <button id="subscribe-button" class="btn btn-outline subscribe-button">
       Subscribe <i class="fas fa-bell"></i>
     </button>
   `;
 }
 
 export function generateUnsubscribeButtonTemplate() {
+  // ... (sisa fungsi tetap sama)
   return `
-    <button id="unsubscribe-button" class="btn unsubscribe-button">
+    <button id="unsubscribe-button" class="btn btn-outline unsubscribe-button">
       Unsubscribe <i class="fas fa-bell-slash"></i>
     </button>
   `;
 }
 
 export function generateSaveStoryButtonTemplate() {
+  // ... (sisa fungsi tetap sama)
   return `
     <button id="story-detail-save" class="btn btn-transparent">
       Simpan story <i class="far fa-bookmark"></i>
@@ -192,6 +203,7 @@ export function generateSaveStoryButtonTemplate() {
 }
 
 export function generateRemoveStoryButtonTemplate() {
+  // ... (sisa fungsi tetap sama)
   return `
     <button id="story-detail-remove" class="btn btn-transparent">
       Buang story <i class="fas fa-bookmark"></i>

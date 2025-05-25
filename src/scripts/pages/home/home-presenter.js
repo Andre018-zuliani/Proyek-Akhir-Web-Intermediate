@@ -28,10 +28,12 @@ export default class HomePresenter {
       await this.showStoriesListMap(); // Peta diinisialisasi duluan
 
       const response = await this.#model.getAllStories();
+      console.log('initialGalleryAndMap: response:', response); // Ini log yang Anda lihat
 
       if (!response.ok) {
-        console.error('initialGalleryAndMap: response:', response);
-        this.#view.populateStoriesListError(response.message);
+        // Anda sudah memiliki pengecekan ini
+        console.error('initialGalleryAndMap: API request failed with response:', response);
+        this.#view.populateStoriesListError(response.message); // Pastikan ini menampilkan pesan error ke UI
         return;
       }
 
