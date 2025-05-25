@@ -1,0 +1,23 @@
+{
+  "name": "StoryApp Dicoding",
+  "short_name": "StoryApp",
+  "description": "Aplikasi berbagi story seputar Dicoding.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#D8AAF3",
+  "theme_color": "#D8AAF3",
+  "icons": [
+    {
+      "src": "images/logo-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/logo-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
