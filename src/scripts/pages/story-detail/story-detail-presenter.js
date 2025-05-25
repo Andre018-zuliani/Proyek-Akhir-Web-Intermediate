@@ -1,3 +1,4 @@
+// src/scripts/pages/story-detail/story-detail-presenter.js
 import { storyMapper } from '../../data/api-mapper';
 
 export default class StoryDetailPresenter {
@@ -12,24 +13,24 @@ export default class StoryDetailPresenter {
   }
 
   async showStoryDetail() {
+    console.log('showStoryDetail called'); // Tambahkan ini untuk debugging
     this.#view.showStoryDetailLoading();
     try {
       const response = await this.#apiModel.getStoryById(this.#storyId);
 
       if (!response.ok) {
         console.error('showStoryDetail: response:', response);
-        this.#view.populateStoryDetailError(response.message);
+        this.#view.populateStoryDetailError(response.message); // Memanggil populateStoryDetailError
         return;
       }
 
-      // Gunakan storyMapper jika memang perlu normalisasi
       const story = await storyMapper(response.story);
-      console.log(story); // for debugging, boleh dihapus jika sudah yakin
+      console.log('Mapped story:', story); // Log story setelah mapping
 
       this.#view.populateStoryDetailAndInitialMap(response.message, story);
     } catch (error) {
       console.error('showStoryDetail: error:', error);
-      this.#view.populateStoryDetailError(error.message);
+      this.#view.populateStoryDetailError(error.message); // Memanggil populateStoryDetailError
     } finally {
       this.#view.hideStoryDetailLoading();
     }

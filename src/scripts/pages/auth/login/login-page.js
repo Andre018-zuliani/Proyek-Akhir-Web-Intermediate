@@ -1,5 +1,6 @@
+// src/scripts/pages/auth/login/login-page.js
 import LoginPresenter from './login-presenter';
-import * as StoriesAPI from '../../../data/api';
+import * as StoriesAPI from '../../../data/api'; // Mengubah CityCareAPI menjadi StoriesAPI
 import * as AuthModel from '../../../utils/auth';
 
 export default class LoginPage {
@@ -41,7 +42,7 @@ export default class LoginPage {
   async afterRender() {
     this.#presenter = new LoginPresenter({
       view: this,
-      model: CityCareAPI,
+      model: StoriesAPI, // Mengubah CityCareAPI menjadi StoriesAPI
       authModel: AuthModel,
     });
 

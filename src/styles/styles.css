@@ -693,16 +693,9 @@ header {
   gap: 10px;
 }
 
-/* Report comments section */
-.report-detail__comments__container {
-  max-width: 800px;
-  margin-block: 30px;
-  margin-inline: auto;
-}
-
-/* Report comments form */
-.report-detail__comments-form__container {
-  margin-block: 20px 40px;
+.report-detail__comments-form__title {
+  margin-block-end: 12px;
+  font-size: 1.5rem;
 }
 
 .report-detail__comments-form__form textarea {
@@ -727,6 +720,94 @@ header {
   position: relative;
 }
 
+/* src/styles/styles.css */
+
+/* ... kode CSS yang sudah ada ... */
+
+/* HOME PAGE */
+.reports-list {
+  /* Ubah nama class ini jika memang sudah diganti di HTML atau JS */
+  display: grid;
+  grid-template-columns: repeat(1, minmax(300px, 1fr));
+  gap: 20px 15px;
+}
+
+/* Tambahkan/Ubah bagian ini untuk tampilan grid 3x3 */
+.stories-list {
+  /* Pastikan nama class ini digunakan di HTML untuk daftar stories */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Auto-fit untuk responsif */
+  gap: 20px; /* Jarak antar item */
+}
+
+.story-item {
+  border-radius: 12px;
+  border: 1px solid #d4d4d4;
+  background-color: #ffffff;
+  overflow: hidden;
+  display: flex; /* Menggunakan flexbox untuk konten di dalam item */
+  flex-direction: column; /* Konten tersusun vertikal */
+}
+
+.story-item__image {
+  display: block;
+  width: 100%;
+  height: 200px; /* Tinggi gambar agar seragam */
+  object-fit: cover; /* Pastikan gambar mengisi area tanpa terdistorsi */
+  object-position: center;
+}
+
+.story-item__body {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Memungkinkan body untuk mengisi ruang yang tersedia */
+}
+
+.story-item__main {
+  flex-grow: 1; /* Main content mengisi ruang */
+  margin-bottom: 10px; /* Jarak antara main content dan author/read more */
+}
+
+.story-item__title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Batasi judul menjadi 2 baris */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.story-item__description {
+  /* Jika ingin menampilkan deskripsi singkat di list */
+  font-size: 0.9rem;
+  color: #5d5d5d;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Batasi deskripsi menjadi 3 baris */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.story-item__more-info {
+  font-size: 0.85rem;
+  color: #5d5d5d;
+}
+
+.story-item__author {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: auto; /* Mendorong author ke bagian bawah */
+}
+
+.story-item__read-more {
+  justify-self: start;
+  margin-top: 15px;
+  align-self: flex-start; /* Mengatur tombol agar tidak memenuhi lebar penuh */
+}
+
+/* ... sisa kode CSS yang sudah ada ... */
+
 .report-detail__comments-list {
   margin-block: 30px;
 
@@ -749,7 +830,6 @@ header {
   width: 50px;
   height: 50px;
   border-radius: 100%;
-
   align-self: start;
 }
 
@@ -761,18 +841,8 @@ header {
   margin-block-end: 8px;
   display: flex;
   gap: 12px;
-
-  color: #555;
 }
 
-.report-detail__comment-item__body__author {
-  font-weight: 600;
-  color: #09090b;
-}
-
-.report-detail__comment-item__body__text {
-  color: #5d5d5d;
-}
 /* Report comments section */
 /* END OF DETAIL PAGE */
 
@@ -935,3 +1005,108 @@ footer {
 .copyright {
   text-align: center;
 }
+
+/* Animasi notifikasi */
+.animated-notification {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  background: #ff9800;
+  color: #fff;
+  padding: 16px 32px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition:
+    opacity 0.4s,
+    transform 0.4s;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.animated-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* src/styles/styles.css */
+
+/* ... (kode CSS yang sudah ada di bagian atas) ... */
+
+/* Notifikasi */
+.notification-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.notification-item {
+  background-color: #333;
+  color: #fff;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(20px);
+  animation-fill-mode: forwards;
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notification-item.show {
+  animation: slideInUp 0.5s ease-out forwards;
+}
+
+.notification-item.hide {
+  animation: slideOutDown 0.5s ease-in forwards;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+/* src/styles/styles.css */
+
+/* ... kode CSS yang sudah ada ... */
+
+/* HOME PAGE */
+/* Pastikan definisi tinggi untuk map container ini ada dan tidak 0px */
+.stories-list__map__container,
+.stories-list__map {
+  height: 400px; /* Contoh tinggi, bisa disesuaikan */
+  position: relative; /* Penting untuk Leaflet */
+}
+
+.stories-list__map__container {
+  background-color: darkgray; /* Warna latar belakang saat map belum terload */
+}
+
+/* ... sisa kode CSS yang sudah ada ... */

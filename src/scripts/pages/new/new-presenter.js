@@ -1,4 +1,5 @@
-import { reportMapper } from '../../data/api-mapper';
+// src/scripts/pages/new/new-presenter.js
+// import { reportMapper } from '../../data/api-mapper'; // reportMapper tidak lagi relevan di sini
 
 export default class NewPresenter {
   #view;
@@ -20,17 +21,18 @@ export default class NewPresenter {
     }
   }
 
-  async postNewReport({ title, damageLevel, description, evidenceImages, latitude, longitude }) {
+  // Mengubah parameter postNewReport agar sesuai dengan API baru
+  async postNewReport({ description, photo, latitude, longitude }) {
+    // Mengubah title, damageLevel, evidenceImages
     this.#view.showSubmitLoadingButton();
     try {
       const data = {
-        title: title,
-        damageLevel: damageLevel,
         description: description,
-        evidenceImages: evidenceImages,
+        photo: photo, // 'photo' untuk file tunggal
         latitude: latitude,
         longitude: longitude,
       };
+      // Menggunakan storeNewStory dari API yang sudah disesuaikan
       const response = await this.#model.storeNewStory(data);
 
       if (!response.ok) {

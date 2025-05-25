@@ -1,16 +1,20 @@
+// src/scripts/pages/new/new-page.js
 import NewPresenter from './new-presenter';
 import { convertBase64ToBlob } from '../../utils';
 import * as StoriesAPI from '../../data/api';
 import { generateLoaderAbsoluteTemplate } from '../../templates';
 import Camera from '../../utils/camera';
 import Map from '../../utils/map';
+import showNotification from '../../utils/notification-handler';
+
+const MAX_FILE_SIZE = 1000000; // 1 MB dalam byte
 
 export default class NewPage {
   #presenter;
   #form;
   #camera;
   #isCameraOpen = false;
-  #takenDocumentations = [];
+  #takenDocumentation = null;
   #map = null;
 
   async render() {
@@ -26,55 +30,13 @@ export default class NewPage {
           </div>
         </div>
       </section>
+  
       <section class="container">
         <div class="new-form__container">
           <form id="new-form" class="new-form">
             <div class="form-control">
-              <label for="title-input" class="new-form__title__title">Judul Story</label>
-              <div class="new-form__title__container">
-                <input
-                  id="title-input"
-                  name="title"
-                  placeholder="Masukkan judul Story"
-                  aria-describedby="title-input-more-info"
-                >
-              </div>
-              <div id="title-input-more-info">Pastikan judul laporan dibuat dengan jelas dan deskriptif dalam 1 kalimat.</div>
-            </div>
-            <div class="form-control">
-              <div class="new-form__damage-level__title">Tingkat Kerusakan</div>
-              <div class="new-form__damage-level__container">
-                <div class="new-form__damage-level__minor__container">
-                  <input id="damage-level-minor-input" type="radio" name="damageLevel" value="minor">
-                  <label for="damage-level-minor-input">
-                    Rendah
-                    <span title="Contoh: Lubang kecil di jalan, kerusakan ringan pada tanda lalu lintas, dll.">
-                      <i class="far fa-question-circle"></i>
-                    </span>
-                  </label>
-                </div>
-                <div class="new-form__damage-level__moderate__container">
-                  <input id="damage-level-moderate-input" type="radio" name="damageLevel" value="moderate">
-                  <label for="damage-level-moderate-input">
-                    Sedang
-                    <span title="Contoh: Jalan retak besar, trotoar amblas, lampu jalan mati, dll.">
-                      <i class="far fa-question-circle"></i>
-                    </span>
-                  </label>
-                </div>
-                <div class="new-form__damage-level__severe__container">
-                  <input id="damage-level-severe-input" type="radio" name="damageLevel" value="severe">
-                  <label for="damage-level-severe-input">
-                    Berat
-                    <span title="Contoh: Jembatan ambruk, tiang listrik roboh, longsor yang menutup jalan, dll.">
-                      <i class="far fa-question-circle"></i>
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="form-control">
-              <label for="description-input" class="new-form__description__title">Keterangan</label>
+              <label for="description-input" class="new-form__description__title">Keterangan Story</label>
+  
               <div class="new-form__description__container">
                 <textarea
                   id="description-input"
@@ -84,21 +46,20 @@ export default class NewPage {
               </div>
             </div>
             <div class="form-control">
-              <label for="documentations-input" class="new-form__documentations__title">Dokumentasi</label>
-              <div id="documentations-more-info">Anda dapat menyertakan foto sebagai dokumentasi.</div>
+              <label for="documentations-input" class="new-form__documentations__title">Foto Story</label>
+              <div id="documentations-more-info">Anda dapat menyertakan satu foto sebagai dokumentasi.</div>
+  
               <div class="new-form__documentations__container">
                 <div class="new-form__documentations__buttons">
                   <button id="documentations-input-button" class="btn btn-outline" type="button">
-                    Ambil Gambar
+                    Unggah Gambar
                   </button>
                   <input
                     id="documentations-input"
-                    name="documentations"
+                    name="documentation"
                     type="file"
                     accept="image/*"
-                    multiple
                     hidden="hidden"
-                    aria-multiline="true"
                     aria-describedby="documentations-more-info"
                   >
                   <button id="open-documentations-camera-button" class="btn btn-outline" type="button">
@@ -110,6 +71,7 @@ export default class NewPage {
                     Video stream not available.
                   </video>
                   <canvas id="camera-canvas" class="new-form__camera__canvas"></canvas>
+  
                   <div class="new-form__camera__tools">
                     <select id="camera-select"></select>
                     <div class="new-form__camera__tools_buttons">
@@ -122,29 +84,33 @@ export default class NewPage {
                 <ul id="documentations-taken-list" class="new-form__documentations__outputs"></ul>
               </div>
             </div>
-            <div class="form-control">
-              <div class="new-form__location__title">Lokasi</div>
-              <div class="new-form__location__container">
-                <div class="new-form__location__map__container">
-                  <div id="map" class="new-form__location__map"></div>
-                  <div id="map-loading-container"></div>
-                </div>
-                <div class="new-form__location__lat-lng">
-                  <input type="number" name="latitude" value="-6.175389" disabled>
-                  <input type="number" name="longitude" value="106.827139" disabled>
-                </div>
+    <section class="container">
+      <div class="new-form__container">
+        <form id="new-form" class="new-form">
+          <div class="form-control">
+            <div class="new-form__location__title">Lokasi</div>
+ 
+            <div class="new-form__location__container">
+              <div class="new-form__location__map__container">
+                <div id="map" class="new-form__location__map"></div>
+                <div id="map-loading-container"></div>
+              </div>
+              <div class="new-form__location__lat-lng">
+                <input type="number" name="latitude" value="-6.175389" disabled>
+                <input type="number" name="longitude" value="106.827139" disabled>
               </div>
             </div>
-            <div class="form-buttons">
-              <span id="submit-button-container">
-                <button class="btn" type="submit">Buat Laporan</button>
-              </span>
-              <a class="btn btn-outline" href="#/">Batal</a>
-            </div>
-          </form>
-        </div>
-      </section>
-    `;
+          </div>
+          <div class="form-buttons">
+            <span id="submit-button-container">
+              <button class="btn" type="submit">Buat Story</button>
+            </span>
+            <a class="btn btn-outline" href="#/">Batal</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  `;
   }
 
   async afterRender() {
@@ -152,15 +118,11 @@ export default class NewPage {
       view: this,
       model: StoriesAPI,
     });
-    this.#takenDocumentations = [];
+    this.#takenDocumentation = null;
 
-    // SETUP FORM DULU!
-    this.#form = document.getElementById('new-form');
+    this.#setupForm(); // <--- Pindahkan pemanggilan #setupForm() ke sini!
 
-    // Menampilkan map pada form
-    await this.#presenter.showNewFormMap();
-
-    this.#setupForm();
+    await this.#presenter.showNewFormMap(); // Sekarang ini akan dipanggil setelah #form diinisialisasi
   }
 
   #setupForm() {
@@ -168,32 +130,44 @@ export default class NewPage {
     this.#form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
-      const description = this.#form.elements.namedItem('description').value.trim();
-      if (!description) {
-        alert('Deskripsi tidak boleh kosong!');
-        return;
-      }
-
       const data = {
-        description: description,
-        evidenceImages: this.#takenDocumentations.map((picture) => picture.blob),
+        description: this.#form.elements.namedItem('description').value,
+        photo: this.#takenDocumentation ? this.#takenDocumentation.blob : null,
         latitude: this.#form.elements.namedItem('latitude').value,
         longitude: this.#form.elements.namedItem('longitude').value,
       };
+
+      if (!data.photo) {
+        showNotification('Mohon sertakan foto untuk story Anda.');
+        return;
+      }
+
+      if (data.photo.size > MAX_FILE_SIZE) {
+        showNotification(`Ukuran gambar terlalu besar. Maksimal ${MAX_FILE_SIZE / 1000000} MB.`);
+        return;
+      }
+
       await this.#presenter.postNewReport(data);
     });
 
     document.getElementById('documentations-input').addEventListener('change', async (event) => {
-      const insertingPicturesPromises = Object.values(event.target.files).map(async (file) => {
-        return await this.#addTakenPicture(file);
-      });
-      await Promise.all(insertingPicturesPromises);
+      const file = event.target.files[0];
+      if (file) {
+        if (file.size > MAX_FILE_SIZE) {
+          showNotification(`Ukuran gambar terlalu besar. Maksimal ${MAX_FILE_SIZE / 1000000} MB.`);
+          event.target.value = '';
+          this.#takenDocumentation = null;
+          await this.#populateTakenPictures();
+          return;
+        }
 
-      await this.#populateTakenPictures();
+        await this.#addTakenPicture(file);
+        await this.#populateTakenPictures();
+      }
     });
 
     document.getElementById('documentations-input-button').addEventListener('click', () => {
-      this.#form.elements.namedItem('documentations-input').click();
+      this.#form.elements.namedItem('documentation').click();
     });
 
     const cameraContainer = document.getElementById('camera-container');
@@ -222,11 +196,10 @@ export default class NewPage {
       locate: true,
     });
 
-    // Preparing marker for select coordinate
     const centerCoordinate = this.#map.getCenter();
     const draggableMarker = this.#map.addMarker(
       [centerCoordinate.latitude, centerCoordinate.longitude],
-      { draggable: 'true' },
+      { draggable: true },
     );
 
     this.#updateLatLngInput(centerCoordinate.latitude, centerCoordinate.longitude);
@@ -234,6 +207,12 @@ export default class NewPage {
     draggableMarker.addEventListener('move', (event) => {
       const coordinate = event.target.getLatLng();
       this.#updateLatLngInput(coordinate.lat, coordinate.lng);
+    });
+
+    this.#map.addMapEventListener('click', (event) => {
+      draggableMarker.setLatLng(event.latlng);
+      event.sourceTarget.flyTo(event.latlng);
+      this.#updateLatLngInput(event.latlng.lat, event.latlng.lng);
     });
   }
 
@@ -253,89 +232,83 @@ export default class NewPage {
 
     this.#camera.addCheeseButtonListener('#camera-take-button', async () => {
       const image = await this.#camera.takePicture();
+
+      if (image && image.size > MAX_FILE_SIZE) {
+        showNotification(`Ukuran gambar terlalu besar. Maksimal ${MAX_FILE_SIZE / 1000000} MB.`);
+        this.#takenDocumentation = null;
+        await this.#populateTakenPictures();
+        return;
+      }
+
       await this.#addTakenPicture(image);
       await this.#populateTakenPictures();
-    });
-
-    this.#map.addMapEventListener('click', (event) => {
-      draggableMarker.setLatLng(event.latlng);
-
-      // Keep center with user view
-      event.sourceTarget.flyTo(event.latlng);
     });
   }
 
   async #addTakenPicture(image) {
     let blob = image;
 
-    if (typeof image === 'string' || image instanceof String) {
+    if (typeof image === 'string') {
       blob = await convertBase64ToBlob(image, 'image/png');
     }
 
-    const newDocumentation = {
+    this.#takenDocumentation = {
       id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       blob: blob,
     };
-    this.#takenDocumentations = [...this.#takenDocumentations, newDocumentation];
   }
 
   async #populateTakenPictures() {
-    const html = this.#takenDocumentations.reduce((accumulator, picture, currentIndex) => {
+    const outputsList = document.getElementById('documentations-taken-list');
+    outputsList.innerHTML = '';
+
+    if (this.#takenDocumentation) {
+      const picture = this.#takenDocumentation;
       const imageUrl = URL.createObjectURL(picture.blob);
-      return accumulator.concat(`
+      const html = `
         <li class="new-form__documentations__outputs-item">
           <button type="button" data-deletepictureid="${picture.id}" class="new-form__documentations__outputs-item__delete-btn">
-            <img src="${imageUrl}" alt="Dokumentasi ke-${currentIndex + 1}">
+            <img src="${imageUrl}" alt="Foto Story">
           </button>
         </li>
-      `);
-    }, '');
+      `;
+      outputsList.innerHTML = html;
 
-    document.getElementById('documentations-taken-list').innerHTML = html;
-
-    document.querySelectorAll('button[data-deletepictureid]').forEach((button) =>
-      button.addEventListener('click', (event) => {
-        const pictureId = event.currentTarget.dataset.deletepictureid;
-
-        const deleted = this.#removePicture(pictureId);
-        if (!deleted) {
-          console.log(`Picture with id ${pictureId} was not found`);
-        }
-
-        // Updating taken pictures
-        this.#populateTakenPictures();
-      }),
-    );
+      document
+        .querySelector(`button[data-deletepictureid="${picture.id}"]`)
+        .addEventListener('click', () => {
+          this.#removePicture(picture.id);
+          this.#populateTakenPictures();
+        });
+    }
   }
 
   #removePicture(id) {
-    const selectedPicture = this.#takenDocumentations.find((picture) => {
-      return picture.id == id;
-    });
-
-    // Check if founded selectedPicture is available
-    if (!selectedPicture) {
-      return null;
+    if (this.#takenDocumentation && this.#takenDocumentation.id === id) {
+      this.#takenDocumentation = null;
+      return true;
     }
-
-    // Deleting selected selectedPicture from takenPictures
-    this.#takenDocumentations = this.#takenDocumentations.filter((picture) => {
-      return picture.id != selectedPicture.id;
-    });
-
-    return selectedPicture;
+    return false;
   }
 
   storeSuccessfully(message) {
     console.log(message);
+    showNotification('Story berhasil dibuat!');
     this.clearForm();
+    this.#takenDocumentation = null;
+    this.#populateTakenPictures();
+    if (this.#isCameraOpen) {
+      this.#camera.stop();
+      document.getElementById('camera-container').classList.remove('open');
+      document.getElementById('open-documentations-camera-button').textContent = 'Buka Kamera';
+      this.#isCameraOpen = false;
+    }
 
-    // Redirect page
     location.hash = '/';
   }
 
   storeFailed(message) {
-    alert(message);
+    showNotification(`Gagal membuat story: ${message}`);
   }
 
   clearForm() {
@@ -353,14 +326,14 @@ export default class NewPage {
   showSubmitLoadingButton() {
     document.getElementById('submit-button-container').innerHTML = `
       <button class="btn" type="submit" disabled>
-        <i class="fas fa-spinner loader-button"></i> Buat Laporan
+        <i class="fas fa-spinner loader-button"></i> Buat Story
       </button>
     `;
   }
 
   hideSubmitLoadingButton() {
     document.getElementById('submit-button-container').innerHTML = `
-      <button class="btn" type="submit">Buat Laporan</button>
+      <button class="btn" type="submit">Buat Story</button>
     `;
   }
 }

@@ -47,7 +47,7 @@ export default class RegisterPage {
   async afterRender() {
     this.#presenter = new RegisterPresenter({
       view: this,
-      model: CityCareAPI,
+      model: StoriesAPI,
     });
 
     this.#setupForm();

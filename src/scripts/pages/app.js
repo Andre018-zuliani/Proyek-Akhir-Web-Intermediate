@@ -1,3 +1,4 @@
+// src/scripts/pages/app.js
 import { getActiveRoute } from '../routes/url-parser';
 import {
   generateAuthenticatedNavigationListTemplate,
@@ -7,6 +8,7 @@ import {
 import { setupSkipToContent, transitionHelper } from '../utils';
 import { getAccessToken, getLogout } from '../utils/auth';
 import { routes } from '../routes/routes';
+import showNotification from '../utils/notification-handler'; // Import showNotification
 
 export default class App {
   #content;
@@ -54,7 +56,6 @@ export default class App {
     const navListMain = this.#drawerNavigation.children.namedItem('navlist-main');
     const navList = this.#drawerNavigation.children.namedItem('navlist');
 
-    // User not log in
     if (!isLogin) {
       navListMain.innerHTML = '';
       navList.innerHTML = generateUnauthenticatedNavigationListTemplate();
@@ -70,8 +71,7 @@ export default class App {
 
       if (confirm('Apakah Anda yakin ingin keluar?')) {
         getLogout();
-
-        // Redirect
+        showNotification('Anda telah berhasil keluar!'); // Notifikasi saat logout
         location.hash = '/login';
       }
     });
@@ -81,7 +81,6 @@ export default class App {
     const url = getActiveRoute();
     const route = routes[url];
 
-    // Get page instance
     const page = route();
 
     const transition = transitionHelper({

@@ -50,15 +50,16 @@ export function checkUnauthenticatedRouteOnly(page) {
   return page;
 }
 
-export function checkAuthenticatedRoute(page) {
-  const isLogin = !!getAccessToken();
-
-  if (!isLogin) {
+export function checkAuthenticatedRoute(pageInstance) {
+  const token = getAccessToken();
+  if (!token) {
     location.hash = '/login';
-    return null;
+    return {
+      render: async () => '',
+      afterRender: async () => {},
+    };
   }
-
-  return page;
+  return pageInstance;
 }
 
 export function getLogout() {

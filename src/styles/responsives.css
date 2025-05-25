@@ -26,13 +26,13 @@
   ::view-transition-old(root) {
     animation:
       fade-out 90ms cubic-bezier(0.4, 0, 1, 1) both,
-      slide-to-left 300ms cubic-bezier(0.4, 0, 0.2, 1) both;
+      slide-to-left 200ms cubic-bezier(0.4, 0, 0.2, 1) both; /* Durasi dikurangi */
   }
 
   ::view-transition-new(root) {
     animation:
       fade-in 210ms cubic-bezier(0, 0, 0.2, 1) 90ms both,
-      slide-from-right 300ms cubic-bezier(0.4, 0, 0.2, 1) both;
+      slide-from-right 200ms cubic-bezier(0.4, 0, 0.2, 1) both; /* Durasi dikurangi */
   }
 
   form .form-buttons {
@@ -40,55 +40,81 @@
     align-items: center;
   }
 
-  /* MAIN */
   /* LOGIN & REGISTER */
   .register-form,
   .login-form {
     border: 1px solid #d4d4d4;
   }
 
-  /* Report detail */
+  /* DETAIL PAGE */
   .report-detail__images {
     height: 400px;
   }
 
   .report-detail__body-container {
+    /* Kelas ini tidak ada di HTML, mungkin typo */
     inset-block-start: -150px;
   }
 
-  /* New documentations */
+  /* NEW REPORT FORM */
   .new-form__documentations__buttons {
     flex-direction: row;
   }
 
   .new-form__documentations__outputs {
-    grid-template-columns: repeat(2, minmax(200px, 300px));
+    grid-template-columns: repeat(
+      2,
+      minmax(150px, 1fr)
+    ); /* 2 kolom untuk mobile landscape/tablet */
+  }
+
+  /* MAIN (HOME & BOOKMARK) */
+  .stories-list {
+    grid-template-columns: repeat(2, minmax(250px, 1fr)); /* 2 kolom untuk tablet */
+  }
+
+  /* HEADER */
+  .header-content {
+    padding-inline: 40px; /* Padding lebih besar untuk tablet */
+  }
+
+  .brand-name__link {
+    font-size: 1.25rem; /* Ukuran font brand name lebih besar */
+  }
+
+  .navigation-drawer.open {
+    inset-block-start: 0; /* Ubah agar drawer menutupi seluruh halaman saat terbuka */
+  }
+
+  .drawer-button {
+    font-size: 32px; /* Ukuran tombol drawer lebih besar */
   }
 }
 
 @media screen and (width > 800px) {
-  /* MAIN */
-  .reports-list__map__container,
-  .reports-list__map {
+  /* MAIN (HOME & BOOKMARK) */
+  .stories-list__map__container,
+  .stories-list__map {
     height: 500px;
   }
 
-  .reports-list {
-    grid-template-columns: repeat(2, minmax(300px, 1fr));
+  .stories-list {
+    grid-template-columns: repeat(3, minmax(250px, 1fr)); /* 3 kolom untuk desktop kecil */
   }
 
-  /* Report detail */
-  .report-detail__body-container {
-    inset-block-start: -200px;
-  }
-
+  /* DETAIL PAGE */
   .report-detail__images {
     height: 500px;
   }
 
-  /* New documentations */
+  .report-detail__body-container {
+    /* Kelas ini tidak ada di HTML, mungkin typo */
+    inset-block-start: -200px;
+  }
+
+  /* NEW REPORT FORM */
   .new-form__documentations__outputs {
-    grid-template-columns: repeat(3, minmax(200px, 300px));
+    grid-template-columns: repeat(3, minmax(150px, 1fr)); /* 3 kolom untuk desktop kecil */
   }
 
   /* FOOTER */
@@ -119,6 +145,15 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    gap: 20px; /* Tambah gap antar item navigasi */
+  }
+
+  .navigation-drawer__navlist li a,
+  .navigation-drawer__navlist li button,
+  .navigation-drawer__navlist-main li a,
+  .navigation-drawer__navlist-main li button {
+    padding: 0; /* Hapus padding untuk tampilan desktop */
+    width: auto; /* Lebar otomatis */
   }
 
   .header-content__nav-list li a {
@@ -129,16 +164,17 @@
     display: none;
   }
 
-  /* MAIN */
-  .reports-list__map__container,
-  .reports-list__map {
+  /* MAIN (HOME & BOOKMARK) */
+  .stories-list__map__container,
+  .stories-list__map {
     height: 600px;
   }
 
-  .reports-list {
-    grid-template-columns: repeat(3, minmax(300px, 1fr));
+  .stories-list {
+    grid-template-columns: repeat(3, minmax(300px, 1fr)); /* 3 kolom, ukuran item lebih besar */
   }
 
+  /* DETAIL PAGE */
   .report-detail__images {
     height: 600px;
   }

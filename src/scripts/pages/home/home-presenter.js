@@ -1,8 +1,12 @@
+// src/scripts/pages/home/home-presenter.js
+import { storyMapper } from '../../data/api-mapper';
+
 export default class HomePresenter {
   #view;
   #model;
 
   constructor({ view, model }) {
+    // Constructor yang menerima objek { view, model }
     this.#view = view;
     this.#model = model;
   }
@@ -21,7 +25,7 @@ export default class HomePresenter {
   async initialGalleryAndMap() {
     this.#view.showLoading();
     try {
-      await this.showStoriesListMap();
+      await this.showStoriesListMap(); // Peta diinisialisasi duluan
 
       const response = await this.#model.getAllStories();
 
@@ -31,23 +35,33 @@ export default class HomePresenter {
         return;
       }
 
-      // Mapping agar ada property location
-      const stories = (response.listStory || [])
-        .filter(
-          (story) =>
-            story &&
-            story.lat !== null &&
-            story.lat !== undefined &&
-            story.lon !== null &&
-            story.lon !== undefined,
-        )
-        .map((story) => ({
-          ...story,
-          location: {
-            latitude: story.lat,
-            longitude: story.lon,
-          },
-        }));
+      const stories = await Promise.all(
+        (response.listStory || []).map(async (rawStory) => {
+          if (!rawStory) {
+            console.warn('Skipping null/undefined raw story in list:', rawStory);
+            return {
+              id: 'unknown-id',
+              name: 'Tidak Diketahui',
+              description: 'Data cerita tidak lengkap atau rusak.',
+              photoUrl: 'images/placeholder-image.jpg',
+              createdAt: new Date().toISOString(),
+              location: { latitude: null, longitude: null, placeName: 'Lokasi tidak tersedia' },
+            };
+          }
+
+          if (typeof rawStory.lat === 'number' && typeof rawStory.lon === 'number') {
+            return await storyMapper(rawStory);
+          }
+          return {
+            ...rawStory,
+            location: {
+              latitude: null,
+              longitude: null,
+              placeName: 'Lokasi tidak tersedia',
+            },
+          };
+        }),
+      );
 
       this.#view.populateStoriesList(response.message, stories);
     } catch (error) {

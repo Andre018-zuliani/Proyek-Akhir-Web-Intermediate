@@ -4,11 +4,13 @@ export default class ReportDetailPresenter {
   #view;
   #apiModel;
   #reportId;
+  #storyId; // Tambahkan deklarasi #storyId
 
-  constructor({ view, apiModel, reportId }) {
+  constructor({ view, apiModel, reportId, storyId }) {
     this.#view = view;
     this.#apiModel = apiModel;
     this.#reportId = reportId;
+    this.#storyId = storyId; // Inisialisasi #storyId
   }
 
   async showReportDetail() {
@@ -34,6 +36,7 @@ export default class ReportDetailPresenter {
   }
 
   async showStoryDetail() {
+    console.log('Story ID:', this.#storyId); // Menambahkan log untuk #storyId
     // ...
   }
 

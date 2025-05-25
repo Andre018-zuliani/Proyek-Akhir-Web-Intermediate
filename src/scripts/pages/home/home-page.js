@@ -1,3 +1,4 @@
+// src/scripts/pages/home/home-page.js
 import {
   generateLoaderAbsoluteTemplate,
   generateStoryItemTemplate,
@@ -6,11 +7,11 @@ import {
 } from '../../templates';
 import HomePresenter from './home-presenter';
 import * as StoriesAPI from '../../data/api';
-import Map from '../../utils/map';
+import Map from '../../utils/map'; // Import Map class
 
 export default class HomePage {
   #presenter = null;
-  #map = null;
+  #map = null; // Properti untuk menyimpan instance peta
 
   async render() {
     return `
@@ -38,75 +39,8 @@ export default class HomePage {
       model: StoriesAPI,
     });
 
+    // initialGalleryAndMap akan memanggil initialMap() melalui presenter
     await this.#presenter.initialGalleryAndMap();
-  }
-
-  populateReportsList(message, reports) {
-    if (reports.length <= 0) {
-      this.populateReportsListEmpty();
-      return;
-    }
-
-    // Log reports for debugging
-    console.log('Reports:', reports);
-
-    const html = reports.reduce((accumulator, report) => {
-      // Skip undefined or malformed reports
-      if (!report || !report.reporter || !report.reporter.name) {
-        console.warn('Skipping invalid report:', report);
-        return accumulator;
-      }
-
-      if (this.#map) {
-        const coordinate = [report.location.latitude, report.location.longitude];
-        const markerOptions = { alt: report.title };
-        const popupOptions = { content: report.title };
-        this.#map.addMarker(coordinate, markerOptions, popupOptions);
-      }
-
-      return accumulator.concat(
-        generateReportItemTemplate({
-          ...report,
-          reporterName: report.reporter.name,
-        }),
-      );
-    }, '');
-
-    document.getElementById('reports-list').innerHTML = `
-      <div class="reports-list">${html}</div>
-    `;
-  }
-
-  populateReportsListEmpty() {
-    document.getElementById('reports-list').innerHTML = generateReportsListEmptyTemplate();
-  }
-
-  populateReportsListError(message) {
-    document.getElementById('reports-list').innerHTML = generateReportsListErrorTemplate(message);
-  }
-
-  async initialMap() {
-    this.#map = await Map.build('#map', {
-      zoom: 10,
-      locate: true,
-    });
-  }
-
-  showMapLoading() {
-    document.getElementById('map-loading-container').innerHTML = generateLoaderAbsoluteTemplate();
-  }
-
-  hideMapLoading() {
-    document.getElementById('map-loading-container').innerHTML = '';
-  }
-
-  showLoading() {
-    document.getElementById('reports-list-loading-container').innerHTML =
-      generateLoaderAbsoluteTemplate();
-  }
-
-  hideLoading() {
-    document.getElementById('reports-list-loading-container').innerHTML = '';
   }
 
   populateStoriesList(message, stories) {
@@ -115,27 +49,52 @@ export default class HomePage {
       return;
     }
 
-    // Log stories for debugging
-    console.log('Stories:', stories);
+    console.log('Stories passed to populateStoriesList:', stories);
 
     const html = stories.reduce((accumulator, story) => {
-      // Skip undefined or malformed stories
-      if (!story || !story.name) {
-        console.warn('Skipping invalid story:', story);
-        return accumulator;
+      // Pengecekan ekstra untuk story dan story.location
+      if (
+        !story ||
+        !story.location ||
+        typeof story.location.latitude === 'undefined' ||
+        typeof story.location.longitude === 'undefined'
+      ) {
+        console.warn(
+          'Skipping story due to missing location data or malformed story object:',
+          story,
+        );
+        return accumulator.concat(
+          generateStoryItemTemplate({
+            id: story?.id || 'unknown',
+            name: story?.name || 'Unknown User',
+            description: story?.description || 'Cerita ini tidak memiliki deskripsi lengkap.',
+            photoUrl: story?.photoUrl || 'images/placeholder-image.jpg',
+            createdAt: story?.createdAt || new Date().toISOString(),
+            location: { latitude: null, longitude: null, placeName: 'Lokasi tidak tersedia' },
+          }),
+        );
       }
 
-      if (this.#map) {
+      // Pastikan #map sudah terinisialisasi dan koordinat berupa angka sebelum menambahkan marker
+      if (
+        this.#map &&
+        typeof story.location.latitude === 'number' &&
+        typeof story.location.longitude === 'number'
+      ) {
         const coordinate = [story.location.latitude, story.location.longitude];
-        const markerOptions = { alt: story.title };
-        const popupOptions = { content: story.title };
+        const markerOptions = { alt: story.description };
+        const popupOptions = { content: story.description };
         this.#map.addMarker(coordinate, markerOptions, popupOptions);
       }
 
       return accumulator.concat(
         generateStoryItemTemplate({
-          ...story,
-          userName: story.name,
+          id: story.id,
+          name: story.name,
+          description: story.description,
+          photoUrl: story.photoUrl,
+          createdAt: story.createdAt,
+          location: story.location, // Menggunakan objek location yang sudah diproses storyMapper
         }),
       );
     }, '');
@@ -154,9 +113,11 @@ export default class HomePage {
   }
 
   async initialMap() {
+    // Fungsi ini dipanggil dari HomePresenter.showStoriesListMap()
+    // untuk menginisialisasi peta.
     this.#map = await Map.build('#map', {
       zoom: 10,
-      locate: true,
+      locate: true, // Akan mencoba menemukan lokasi pengguna sebagai center awal
     });
   }
 
@@ -178,6 +139,7 @@ export default class HomePage {
   }
 
   viewStoryDetail() {
+    // Fungsi ini mungkin tidak digunakan langsung di Home, tapi ada untuk konsistensi
     this.#presenter.showStoryDetail();
   }
 }
