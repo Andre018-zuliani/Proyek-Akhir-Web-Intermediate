@@ -14,7 +14,7 @@ CityCareApp adalah aplikasi pelaporan kerusakan fasilitas umum yang memungkinkan
 
 - Masuk ke direktori proyek:
   ```bash
-  cd citycareapp-starter-project
+  cd Storyapp-starter-project
   ```
 
 - Pasang seluruh dependensi:
