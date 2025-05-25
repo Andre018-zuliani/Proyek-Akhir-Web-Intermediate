@@ -48,8 +48,8 @@ Proyek ini adalah aplikasi web "StoryApp" yang memungkinkan pengguna untuk berba
 
 1.  Clone repository ini:
     ```bash
-    git clone <URL_REPOSITORY_ANDA>
-    cd <NAMA_DIREKTORI_PROYEK>
+    git clone [<URL_REPOSITORY_ANDA>](https://github.com/Andre018-zuliani/Proyek-Akhir-Web-Intermediate/)
+    cd [<NAMA_DIREKTORI_PROYEK>](https://andre018-zuliani.github.io/Proyek-Akhir-Web-Intermediate/)]
     ```
 2.  Pasang seluruh dependensi:
     ```bash
