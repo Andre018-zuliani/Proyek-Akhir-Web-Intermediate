@@ -1,3 +1,4 @@
+// webpack.common.js
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -5,9 +6,10 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
   entry: {
     app: path.resolve(__dirname, 'src/scripts/index.js'),
+    sw: path.resolve(__dirname, 'src/sw.js'), // Tambahkan ini
   },
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name].bundle.js', // Akan menghasilkan app.bundle.js dan sw.bundle.js
     path: path.resolve(__dirname, 'dist'),
   },
   module: {

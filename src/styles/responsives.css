@@ -51,10 +51,10 @@
     height: 400px;
   }
 
-  .report-detail__body-container {
-    /* Kelas ini tidak ada di HTML, mungkin typo */
+  /* Baris ini dihapus karena tidak ada di HTML */
+  /* .report-detail__body-container {
     inset-block-start: -150px;
-  }
+  } */
 
   /* NEW REPORT FORM */
   .new-form__documentations__buttons {
@@ -69,6 +69,7 @@
   }
 
   /* MAIN (HOME & BOOKMARK) */
+  /* Mengganti reports-list menjadi stories-list */
   .stories-list {
     grid-template-columns: repeat(2, minmax(250px, 1fr)); /* 2 kolom untuk tablet */
   }
@@ -93,11 +94,13 @@
 
 @media screen and (width > 800px) {
   /* MAIN (HOME & BOOKMARK) */
+  /* Mengganti reports-list__map__container menjadi stories-list__map__container */
   .stories-list__map__container,
   .stories-list__map {
     height: 500px;
   }
 
+  /* Mengganti reports-list menjadi stories-list */
   .stories-list {
     grid-template-columns: repeat(3, minmax(250px, 1fr)); /* 3 kolom untuk desktop kecil */
   }
@@ -107,10 +110,10 @@
     height: 500px;
   }
 
-  .report-detail__body-container {
-    /* Kelas ini tidak ada di HTML, mungkin typo */
+  /* Baris ini dihapus karena tidak ada di HTML */
+  /* .report-detail__body-container {
     inset-block-start: -200px;
-  }
+  } */
 
   /* NEW REPORT FORM */
   .new-form__documentations__outputs {
@@ -165,11 +168,13 @@
   }
 
   /* MAIN (HOME & BOOKMARK) */
+  /* Mengganti reports-list__map__container menjadi stories-list__map__container */
   .stories-list__map__container,
   .stories-list__map {
     height: 600px;
   }
 
+  /* Mengganti reports-list menjadi stories-list */
   .stories-list {
     grid-template-columns: repeat(3, minmax(300px, 1fr)); /* 3 kolom, ukuran item lebih besar */
   }

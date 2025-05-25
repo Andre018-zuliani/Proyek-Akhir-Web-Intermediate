@@ -4,11 +4,14 @@ import {
   generateAuthenticatedNavigationListTemplate,
   generateMainNavigationListTemplate,
   generateUnauthenticatedNavigationListTemplate,
+  generateSubscribeButtonTemplate, // Import
+  generateUnsubscribeButtonTemplate, // Import
 } from '../templates';
 import { setupSkipToContent, transitionHelper } from '../utils';
 import { getAccessToken, getLogout } from '../utils/auth';
 import { routes } from '../routes/routes';
-import showNotification from '../utils/notification-handler'; // Import showNotification
+import showNotification from '../utils/notification-handler';
+import NotificationInitiator from '../utils/notification-initiator'; // Import
 
 export default class App {
   #content;
@@ -51,14 +54,20 @@ export default class App {
     });
   }
 
-  #setupNavigationList() {
+  async #setupNavigationList() {
+    // Ubah jadi async
     const isLogin = !!getAccessToken();
     const navListMain = this.#drawerNavigation.children.namedItem('navlist-main');
     const navList = this.#drawerNavigation.children.namedItem('navlist');
+    const pushNotificationTools = document.getElementById('push-notification-tools'); // Ambil elemennya
 
     if (!isLogin) {
       navListMain.innerHTML = '';
       navList.innerHTML = generateUnauthenticatedNavigationListTemplate();
+      // Untuk pengguna yang tidak login, sembunyikan atau biarkan kosong area notifikasi
+      if (pushNotificationTools) {
+        pushNotificationTools.innerHTML = ''; // Pastikan tidak ada konten notifikasi saat tidak login
+      }
       return;
     }
 
@@ -66,15 +75,40 @@ export default class App {
     navList.innerHTML = generateAuthenticatedNavigationListTemplate();
 
     const logoutButton = document.getElementById('logout-button');
-    logoutButton.addEventListener('click', (event) => {
-      event.preventDefault();
+    if (logoutButton) {
+      logoutButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        if (confirm('Apakah Anda yakin ingin keluar?')) {
+          getLogout();
+          showNotification('Anda telah berhasil keluar!');
+          location.hash = '/login';
+        }
+      });
+    }
 
-      if (confirm('Apakah Anda yakin ingin keluar?')) {
-        getLogout();
-        showNotification('Anda telah berhasil keluar!'); // Notifikasi saat logout
-        location.hash = '/login';
+    // Logic untuk tombol push notification
+    if (pushNotificationTools) {
+      const isSubscribed = await NotificationInitiator.getSubscriptionStatus();
+      if (isSubscribed) {
+        pushNotificationTools.innerHTML = generateUnsubscribeButtonTemplate();
+        const unsubscribeButton = document.getElementById('unsubscribe-button');
+        if (unsubscribeButton) {
+          unsubscribeButton.addEventListener('click', async () => {
+            await NotificationInitiator.unsubscribe();
+            this.#setupNavigationList(); // Refresh tombol setelah unsubscribe
+          });
+        }
+      } else {
+        pushNotificationTools.innerHTML = generateSubscribeButtonTemplate();
+        const subscribeButton = document.getElementById('subscribe-button');
+        if (subscribeButton) {
+          subscribeButton.addEventListener('click', async () => {
+            await NotificationInitiator.subscribe();
+            this.#setupNavigationList(); // Refresh tombol setelah subscribe
+          });
+        }
       }
-    });
+    }
   }
 
   async renderPage() {
@@ -93,7 +127,7 @@ export default class App {
     transition.ready.catch(console.error);
     transition.updateCallbackDone.then(() => {
       scrollTo({ top: 0, behavior: 'instant' });
-      this.#setupNavigationList();
+      this.#setupNavigationList(); // Panggil async ini setelah DOM dirender
     });
   }
 }

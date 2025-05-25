@@ -1,44 +1,39 @@
-import { reportMapper } from '../../data/api-mapper';
+// src/scripts/pages/detail/story-detail-presenter.js
+import { storyMapper } from '../../data/api-mapper'; // Perubahan di sini
 
-export default class ReportDetailPresenter {
+export default class StoryDetailPresenter {
   #view;
   #apiModel;
-  #reportId;
-  #storyId; // Tambahkan deklarasi #storyId
+  // #reportId; // Hapus baris ini
+  #storyId;
 
-  constructor({ view, apiModel, reportId, storyId }) {
+  constructor({ view, apiModel, storyId }) { // Hapus reportId dari parameter constructor
     this.#view = view;
     this.#apiModel = apiModel;
-    this.#reportId = reportId;
-    this.#storyId = storyId; // Inisialisasi #storyId
+    // this.#reportId = reportId; // Hapus baris ini
+    this.#storyId = storyId;
   }
 
-  async showReportDetail() {
-    this.#view.showReportDetailLoading();
+  async showStoryDetail() { // Ganti nama fungsi menjadi showStoryDetail
+    console.log('showStoryDetail called'); // Tambahkan ini untuk debugging
+    this.#view.showStoryDetailLoading(); // Ganti showReportDetailLoading
     try {
-      const response = await this.#apiModel.getReportById(this.#reportId);
+      const response = await this.#apiModel.getStoryById(this.#storyId); // Ganti getReportById dan gunakan #storyId
 
       if (!response.ok) {
-        console.error('showReportDetail: response:', response);
-        this.#view.populateReportDetailError(response.message);
+        console.error('showStoryDetail: response:', response); // Sesuaikan log
+        this.#view.populateStoryDetailError(response.message); // Sesuaikan populateReportDetailError
         return;
       }
 
-      const report = await reportMapper(response.data);
-      console.log(report); // for debugging purpose, remove after checking it
-      this.#view.populateReportDetailAndInitialMap(response.message, report);
+      const story = await storyMapper(response.story); // Ganti reportMapper dan gunakan response.story
+      console.log('Mapped story:', story); // Log story setelah mapping
+      this.#view.populateStoryDetailAndInitialMap(response.message, story); // Sesuaikan populateReportDetailAndInitialMap
     } catch (error) {
-      console.error('showReportDetail: error:', error);
-      this.#view.populateReportDetailError(error.message);
+      console.error('showStoryDetail: error:', error); // Sesuaikan log
+      this.#view.populateStoryDetailError(error.message); // Sesuaikan populateReportDetailError
     } finally {
-      this.#view.hideReportDetailLoading();
+      this.#view.hideStoryDetailLoading(); // Ganti hideReportDetailLoading
     }
   }
-
-  async showStoryDetail() {
-    console.log('Story ID:', this.#storyId); // Menambahkan log untuk #storyId
-    // ...
-  }
-
-  // ...kode lainnya disembunyikan...
 }

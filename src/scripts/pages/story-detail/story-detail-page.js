@@ -1,8 +1,8 @@
 // src/scripts/pages/story-detail/story-detail-page.js
 import {
   generateLoaderAbsoluteTemplate,
-  generateStoryDetailErrorTemplate,
-  generateStoryDetailTemplate,
+  generateStoryDetailErrorTemplate, // Pastikan ini diimport
+  generateStoryDetailTemplate, // Pastikan ini diimport
   generateSaveStoryButtonTemplate,
   generateRemoveStoryButtonTemplate,
 } from '../../templates';
@@ -16,7 +16,7 @@ export default class StoryDetailPage {
   #presenter = null;
   #form = null;
   #map = null;
-  #storyId = null; // Menambahkan storyId sebagai properti page
+  #storyId = null;
 
   async render() {
     return `
@@ -31,11 +31,11 @@ export default class StoryDetailPage {
   }
 
   async afterRender() {
-    this.#storyId = parseActivePathname().id; // Ambil ID dari URL
+    this.#storyId = parseActivePathname().id;
     this.#presenter = new StoryDetailPresenter({
       view: this,
       apiModel: StoriesAPI,
-      storyId: this.#storyId, // Teruskan storyId ke presenter
+      storyId: this.#storyId,
     });
 
     this.#setupForm();
@@ -78,7 +78,7 @@ export default class StoryDetailPage {
       }
     }
 
-    this.renderSaveButton(story.id); // Teruskan story.id ke renderSaveButton
+    this.renderSaveButton(story.id);
     this.addNotifyMeEventListener();
   }
 
@@ -106,12 +106,12 @@ export default class StoryDetailPage {
   }
 
   // --- Perbaikan untuk fungsi loading ---
-  showStoryDetailLoading() {
+  showStoryDetailLoading() { // Perubahan nama fungsi
     document.getElementById('report-detail-loading-container').innerHTML =
       generateLoaderAbsoluteTemplate();
   }
 
-  hideStoryDetailLoading() {
+  hideStoryDetailLoading() { // Perubahan nama fungsi
     document.getElementById('report-detail-loading-container').innerHTML = '';
   }
   // --- Akhir perbaikan untuk fungsi loading ---
@@ -126,7 +126,6 @@ export default class StoryDetailPage {
 
   // Fitur Simpan Story
   renderSaveButton(storyId) {
-    // Periksa apakah storyId ini sudah ada di localStorage (bookmark)
     const bookmarkedStories = JSON.parse(localStorage.getItem('bookmarkedStories')) || [];
     const isBookmarked = bookmarkedStories.some((story) => story.id === storyId);
 
@@ -145,7 +144,6 @@ export default class StoryDetailPage {
     }
   }
 
-  // Method untuk menyimpan story ke bookmark
   async saveStoryToBookmark(storyId) {
     try {
       const response = await StoriesAPI.getStoryById(storyId);
@@ -153,15 +151,14 @@ export default class StoryDetailPage {
         showNotification('Gagal mendapatkan detail story untuk disimpan.');
         return;
       }
-      const storyToSave = response.story; // Story object dari API
+      const storyToSave = response.story;
 
       const bookmarkedStories = JSON.parse(localStorage.getItem('bookmarkedStories')) || [];
-      // Pastikan tidak ada duplikasi sebelum menyimpan
       if (!bookmarkedStories.some((story) => story.id === storyToSave.id)) {
         bookmarkedStories.push(storyToSave);
         localStorage.setItem('bookmarkedStories', JSON.stringify(bookmarkedStories));
         showNotification('Story berhasil disimpan!');
-        this.renderSaveButton(storyId); // Perbarui tombol setelah disimpan
+        this.renderSaveButton(storyId);
       } else {
         showNotification('Story sudah ada di daftar simpanan.');
       }
@@ -171,13 +168,12 @@ export default class StoryDetailPage {
     }
   }
 
-  // Method untuk menghapus story dari bookmark
   removeStoryFromBookmark(storyId) {
     let bookmarkedStories = JSON.parse(localStorage.getItem('bookmarkedStories')) || [];
     bookmarkedStories = bookmarkedStories.filter((story) => story.id !== storyId);
     localStorage.setItem('bookmarkedStories', JSON.stringify(bookmarkedStories));
     showNotification('Story berhasil dibuang dari daftar simpanan!');
-    this.renderSaveButton(storyId); // Perbarui tombol setelah dibuang
+    this.renderSaveButton(storyId);
   }
 
   addNotifyMeEventListener() {
