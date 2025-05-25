@@ -1,4 +1,4 @@
-# CityCare App Starter Project
+# Story App Starter Project
 
 ## Pengantar
 
@@ -14,7 +14,7 @@ CityCareApp adalah aplikasi pelaporan kerusakan fasilitas umum yang memungkinkan
 
 ## Instalasi
 
-- Unduh starter project [citycareapp-starter-project.zip](https://raw.githubusercontent.com/dicodingacademy/a219-web-intermediate-labs/099-shared-files/citycareapp-starter-project.zip).
+- Unduh starter project
 - Unzip berkas ZIP yang telah diunduh. Bisa pakai perintah berikut untuk Linux:
   ```bash
   unzip ./citycareapp-starter-project.zip
