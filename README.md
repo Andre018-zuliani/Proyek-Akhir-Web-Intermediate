@@ -12,14 +12,6 @@ CityCareApp adalah aplikasi pelaporan kerusakan fasilitas umum yang memungkinkan
 - Node.js (disarankan versi terbaru)
 - npm atau yarn
 
-## Instalasi
-
-- Unduh starter project
-- Unzip berkas ZIP yang telah diunduh. Bisa pakai perintah berikut untuk Linux:
-  ```bash
-  unzip ./citycareapp-starter-project.zip
-  ```
-
 - Masuk ke direktori proyek:
   ```bash
   cd citycareapp-starter-project
