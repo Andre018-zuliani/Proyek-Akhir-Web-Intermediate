@@ -18,11 +18,21 @@ export default class StoryDetailPresenter {
   }
 
   async showStoryDetail() {
-    // ... (kode Anda yang sudah ada untuk menampilkan detail dari API) ...
-    // Setelah detail dari API berhasil dimuat dan story tersedia:
-    // this.#view.populateStoryDetailAndInitialMap(response.message, story);
-    // Tambahkan pemanggilan untuk menampilkan tombol save/remove yang sesuai
-    await this.showSaveButton();
+    this.#view.showStoryDetailLoading();
+    try {
+      const response = await this.#apiModel.getStoryById(this.#storyId);
+      if (!response.ok) {
+        this.#view.populateStoryDetailError(response.message);
+        return;
+      }
+      const story = await storyMapper(response.story);
+      this.#view.populateStoryDetailAndInitialMap(response.message, story);
+    } catch (error) {
+      this.#view.populateStoryDetailError(error.message);
+    } finally {
+      this.#view.hideStoryDetailLoading();
+      await this.showSaveButton();
+    }
   }
 
   async #isStorySaved() {

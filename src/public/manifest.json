@@ -41,14 +41,14 @@
       "src": "images/screenshots/screenshot-desktop-1.png",
       "sizes": "1280x720",
       "type": "image/png",
-      "form_factor": "desktop",
+      "form_factor": "wide",
       "label": "Tampilan Utama Desktop StoryApp"
     },
     {
       "src": "images/screenshots/screenshot-mobile-1.png",
       "sizes": "720x1280",
       "type": "image/png",
-      "form_factor": "mobile",
+      "form_factor": "narrow",
       "label": "Tampilan Utama Mobile StoryApp"
     }
   ]
