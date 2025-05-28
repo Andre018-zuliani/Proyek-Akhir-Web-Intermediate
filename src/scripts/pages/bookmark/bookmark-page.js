@@ -1,20 +1,21 @@
 // src/scripts/pages/bookmark/bookmark-page.js
 import {
-  generateStoriesListEmptyTemplate, //
-  generateStoriesListErrorTemplate, //
   generateLoaderAbsoluteTemplate, //
   generateStoryItemTemplate, //
+  generateStoriesListEmptyTemplate, //
+  generateStoriesListErrorTemplate, //
 } from '../../templates';
-import { storyMapper } from '../../data/api-mapper'; //
+import BookmarkPresenter from './bookmark-presenter'; // Impor presenter baru
 import Map from '../../utils/map'; //
-// Impor fungsi IndexedDB
-import { getAllStoriesFromDB } from '../../data/indexeddb-manager';
+// Hapus import StoryAppDB jika presenter yang akan mengelolanya
+// import StoryAppDB from '../../data/indexeddb-manager'; //
 
 export default class BookmarkPage {
-  #map = null; //
+  #presenter = null; // Tambahkan presenter
+  #map = null;
 
   async render() {
-    // <--- METHOD RENDER ADA DI SINI
+    //
     return `
       <section>
         <div class="stories-list__map__container">
@@ -35,35 +36,43 @@ export default class BookmarkPage {
   }
 
   async afterRender() {
-    // ... (kode afterRender Anda) ...
+    this.#presenter = new BookmarkPresenter({
+      // Inisialisasi presenter
+      view: this,
+    });
+
+    await this.#presenter.initialGalleryAndMap();
   }
 
-  // ... (method lainnya seperti populateStoriesList, initialMap, showLoading, dll. ada di sini) ...
-  // Pastikan method-method ini juga terdefinisi dengan benar di file Anda.
-  // Misalnya:
   populateStoriesList(stories) {
-    if (stories.length === 0) {
+    //
+    const storiesListElement = document.getElementById('stories-list');
+    if (!storiesListElement) return;
+
+    if (!stories || stories.length === 0) {
       this.populateStoriesListEmpty();
       return;
     }
 
     const html = stories.reduce((accumulator, story) => {
+      // Pastikan story dan story.location ada dan valid sebelum menambahkan marker
       if (
         this.#map &&
+        story &&
         story.location &&
         typeof story.location.latitude === 'number' &&
         typeof story.location.longitude === 'number'
       ) {
         const coordinate = [story.location.latitude, story.location.longitude];
-        const markerOptions = { alt: story.description };
-        // Pastikan story.description ada, atau gunakan fallback
-        const popupContent = story.description || 'Story';
-        const popupOptions = { content: popupContent };
+        const markerOptions = { alt: story.description || 'Story' };
+        const popupOptions = { content: story.description || 'Story Detail' };
         this.#map.addMarker(coordinate, markerOptions, popupOptions);
       }
 
       return accumulator.concat(
         generateStoryItemTemplate({
+          //
+          // Pastikan semua properti yang dibutuhkan oleh template tersedia di objek 'story' dari DB
           id: story.id,
           name: story.name,
           description: story.description,
@@ -74,41 +83,46 @@ export default class BookmarkPage {
       );
     }, '');
 
-    const storiesListElement = document.getElementById('stories-list');
-    if (storiesListElement) {
-      storiesListElement.innerHTML = `<div class="stories-list">${html}</div>`;
-    }
+    storiesListElement.innerHTML = `<div class="stories-list">${html}</div>`;
   }
 
   populateStoriesListEmpty() {
+    //
     const storiesListElement = document.getElementById('stories-list');
     if (storiesListElement) {
-      storiesListElement.innerHTML = generateStoriesListEmptyTemplate();
+      storiesListElement.innerHTML = generateStoriesListEmptyTemplate(); //
     }
   }
 
   populateStoriesListError(message) {
+    //
     const storiesListElement = document.getElementById('stories-list');
     if (storiesListElement) {
-      storiesListElement.innerHTML = generateStoriesListErrorTemplate(message);
+      storiesListElement.innerHTML = generateStoriesListErrorTemplate(message); //
     }
   }
 
   async initialMap() {
+    //
     this.#map = await Map.build('#map', {
-      zoom: 10,
-      locate: true,
+      //
+      zoom: 5, // Zoom awal bisa disesuaikan
+      // Tidak menggunakan locate: true agar peta terpusat pada story yang ada,
+      // atau Anda bisa menyesuaikan logic untuk memusatkan peta berdasarkan story.
+      center: [-2.548926, 118.0148634], // Contoh: tengah Indonesia
     });
   }
 
   showMapLoading() {
+    //
     const mapLoadingContainer = document.getElementById('map-loading-container');
     if (mapLoadingContainer) {
-      mapLoadingContainer.innerHTML = generateLoaderAbsoluteTemplate();
+      mapLoadingContainer.innerHTML = generateLoaderAbsoluteTemplate(); //
     }
   }
 
   hideMapLoading() {
+    //
     const mapLoadingContainer = document.getElementById('map-loading-container');
     if (mapLoadingContainer) {
       mapLoadingContainer.innerHTML = '';
@@ -116,13 +130,15 @@ export default class BookmarkPage {
   }
 
   showLoading() {
+    //
     const loadingContainer = document.getElementById('stories-list-loading-container');
     if (loadingContainer) {
-      loadingContainer.innerHTML = generateLoaderAbsoluteTemplate();
+      loadingContainer.innerHTML = generateLoaderAbsoluteTemplate(); //
     }
   }
 
   hideLoading() {
+    //
     const loadingContainer = document.getElementById('stories-list-loading-container');
     if (loadingContainer) {
       loadingContainer.innerHTML = '';

@@ -19,5 +19,37 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Buat Story Baru",
+      "short_name": "Buat Story",
+      "description": "Buka halaman untuk membuat story baru",
+      "url": "/index.html#/new",
+      "icons": [
+        {
+          "src": "images/add-story-shortcut-icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "images/screenshots/screenshot-desktop-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "desktop",
+      "label": "Tampilan Utama Desktop StoryApp"
+    },
+    {
+      "src": "images/screenshots/screenshot-mobile-1.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "mobile",
+      "label": "Tampilan Utama Mobile StoryApp"
+    }
   ]
 }

@@ -1,27 +1,33 @@
 // src/scripts/pages/story-detail/story-detail-page.js
 import {
-  // ... (impor lainnya)
-  generateSaveStoryButtonTemplate,
-  generateRemoveStoryButtonTemplate,
+  generateStoryDetailTemplate, //
+  generateSaveStoryButtonTemplate, //
+  generateRemoveStoryButtonTemplate, //
+  generateLoaderAbsoluteTemplate, //
 } from '../../templates';
 import StoryDetailPresenter from './story-detail-presenter'; //
 import { parseActivePathname } from '../../routes/url-parser'; //
 import * as StoriesAPI from '../../data/api'; //
 import Map from '../../utils/map'; //
 import showNotification from '../../utils/notification-handler'; //
-// Impor fungsi IndexedDB
-import { addStoryToDB, getStoryByIdFromDB, deleteStoryFromDB } from '../../data/indexeddb-manager';
+// Impor model database Anda jika Presenter tidak mengelolanya secara langsung
+// import StoryAppDB from '../../data/indexeddb-manager'; // // Tidak perlu jika presenter sudah handle
 
 export default class StoryDetailPage {
   #presenter = null;
-  #storyData = null; // Untuk menyimpan data story yang sedang ditampilkan
-  #map = null; //
-  #storyId = null; //
+  #storyData = null;
+  #map = null;
+  #storyId = null;
 
-  // ... (render, afterRender seperti sebelumnya) ...
+  async render() {
+    return `
+      <article id="report-detail" class="report-detail">
+        ${generateLoaderAbsoluteTemplate()}
+      </article>
+    `;
+  }
 
   async afterRender() {
-    //
     this.#storyId = parseActivePathname().id; //
     this.#presenter = new StoryDetailPresenter({
       //
@@ -29,87 +35,117 @@ export default class StoryDetailPage {
       apiModel: StoriesAPI, //
       storyId: this.#storyId,
     });
-    // Hapus #setupForm() jika tidak lagi relevan atau sesuaikan
-    // this.#setupForm();
 
-    await this.#presenter.showStoryDetail();
+    await this.#presenter.showStoryDetail(); // Ini akan mengambil data dari API dan juga memanggil showSaveButton()
   }
 
+  // Fungsi ini dipanggil oleh Presenter setelah data API didapatkan
   async populateStoryDetailAndInitialMap(message, story) {
     //
-    this.#storyData = story; // Simpan data story
-    // ... (sisa kode rendering template detail story) ...
-    document.getElementById('report-detail').innerHTML = generateStoryDetailTemplate({
-      /* ...story data... */
-    }); //
+    this.#storyData = story;
+    const storyDetailContainer = document.getElementById('report-detail');
+    if (storyDetailContainer) {
+      storyDetailContainer.innerHTML = generateStoryDetailTemplate(story); //
 
-    // ... (logika peta) ...
-    if (
-      story.location &&
-      typeof story.location.latitude === 'number' &&
-      typeof story.location.longitude === 'number'
-    ) {
-      // ...
-      await this.initialMap(); //
-      // ...
-    }
-
-    await this.renderSaveButton(story.id); // Ubah jadi async
-    this.addNotifyMeEventListener(); //
-  }
-
-  // ... (populateStoryDetailError, initialMap, loading functions, addNotifyMeEventListener seperti sebelumnya) ...
-
-  async renderSaveButton(storyId) {
-    // Ubah jadi async
-    // Cek apakah story sudah ada di IndexedDB
-    const bookmarkedStory = await getStoryByIdFromDB(storyId);
-    const isBookmarked = !!bookmarkedStory;
-
-    if (isBookmarked) {
-      document.getElementById('save-actions-container').innerHTML =
-        generateRemoveStoryButtonTemplate(); //
-      document.getElementById('story-detail-remove').addEventListener('click', async () => {
-        await this.removeStoryFromBookmark(storyId);
-      });
+      // Inisialisasi peta jika ada data lokasi
+      if (
+        story.location &&
+        typeof story.location.latitude === 'number' &&
+        typeof story.location.longitude === 'number'
+      ) {
+        await this.initialMap(story.location.latitude, story.location.longitude, story.description);
+      }
+      // Tombol save/remove akan dirender oleh showSaveButton() yang dipanggil presenter
     } else {
-      document.getElementById('save-actions-container').innerHTML =
-        generateSaveStoryButtonTemplate(); //
-      document.getElementById('story-detail-save').addEventListener('click', async () => {
-        // Pastikan #storyData ada sebelum menyimpan
-        if (this.#storyData) {
-          await this.saveStoryToBookmark(this.#storyData); // Kirim seluruh objek story
-        } else {
-          showNotification('Data story tidak tersedia untuk disimpan.'); //
-        }
+      console.error('Element with id "report-detail" not found.');
+    }
+  }
+
+  populateStoryDetailError(message) {
+    //
+    const storyDetailContainer = document.getElementById('report-detail');
+    if (storyDetailContainer) {
+      // Anda mungkin ingin template error khusus untuk ini
+      storyDetailContainer.innerHTML = `<p class="error-message">Gagal memuat cerita: ${message}</p>`;
+    }
+  }
+
+  async initialMap(latitude, longitude, popupContent) {
+    //
+    const mapContainer = document.getElementById('map');
+    const mapLoadingContainer = document.getElementById('map-loading-container');
+
+    if (mapContainer && mapLoadingContainer) {
+      mapLoadingContainer.innerHTML = generateLoaderAbsoluteTemplate(); //
+      try {
+        this.#map = await Map.build('#map', {
+          //
+          center: [latitude, longitude],
+          zoom: 15,
+        });
+        this.#map.addMarker([latitude, longitude], {}, { content: popupContent });
+      } catch (error) {
+        console.error('Error initializing map:', error);
+        mapContainer.innerHTML = '<p>Gagal memuat peta.</p>';
+      } finally {
+        mapLoadingContainer.innerHTML = '';
+      }
+    }
+  }
+
+  // Dipanggil oleh Presenter
+  renderSaveButton() {
+    const saveActionsContainer = document.getElementById('save-actions-container');
+    if (saveActionsContainer) {
+      saveActionsContainer.innerHTML = generateSaveStoryButtonTemplate(); //
+      const saveButton = document.getElementById('story-detail-save');
+      if (saveButton) {
+        saveButton.addEventListener('click', async () => {
+          if (this.#storyData) {
+            // Pastikan #storyData ada
+            await this.#presenter.saveStoryToBookmark(this.#storyData);
+          } else {
+            showNotification('Data cerita belum dimuat untuk disimpan.'); //
+          }
+        });
+      }
+    }
+  }
+
+  // Dipanggil oleh Presenter
+  renderRemoveButton() {
+    const saveActionsContainer = document.getElementById('save-actions-container');
+    if (saveActionsContainer) {
+      saveActionsContainer.innerHTML = generateRemoveStoryButtonTemplate(); //
+      const removeButton = document.getElementById('story-detail-remove');
+      if (removeButton) {
+        removeButton.addEventListener('click', async () => {
+          await this.#presenter.removeStoryFromBookmark();
+        });
+      }
+    }
+  }
+
+  // Metode loading (Anda sudah punya ini, pastikan digunakan jika perlu)
+  showStoryDetailLoading() {
+    const storyDetailContainer = document.getElementById('report-detail');
+    if (storyDetailContainer) {
+      storyDetailContainer.innerHTML = generateLoaderAbsoluteTemplate(); //
+    }
+  }
+
+  hideStoryDetailLoading() {
+    // Konten akan diganti oleh populateStoryDetailAndInitialMap atau populateStoryDetailError
+  }
+
+  // Event listener untuk tombol notifikasi (jika masih relevan)
+  addNotifyMeEventListener() {
+    //
+    const notifyButton = document.getElementById('report-detail-notify-me');
+    if (notifyButton) {
+      notifyButton.addEventListener('click', () => {
+        showNotification('Fitur notifikasi detail cerita akan segera hadir!'); //
       });
-    }
-  }
-
-  async saveStoryToBookmark(storyToSave) {
-    // Terima objek story
-    try {
-      // Tidak perlu fetch lagi dari API karena kita sudah punya #storyData
-      // Data story yang disimpan harus berupa objek JavaScript biasa,
-      // bukan respons API mentah jika sebelumnya Anda menyimpannya demikian.
-      // Pastikan storyToSave adalah objek yang bersih.
-      await addStoryToDB(storyToSave);
-      showNotification('Story berhasil disimpan ke IndexedDB!'); //
-      await this.renderSaveButton(storyToSave.id);
-    } catch (error) {
-      console.error('Error saving story to IndexedDB:', error);
-      showNotification(`Terjadi kesalahan saat menyimpan story: ${error.message}`); //
-    }
-  }
-
-  async removeStoryFromBookmark(storyId) {
-    try {
-      await deleteStoryFromDB(storyId);
-      showNotification('Story berhasil dibuang dari IndexedDB!'); //
-      await this.renderSaveButton(storyId);
-    } catch (error) {
-      console.error('Error removing story from IndexedDB:', error);
-      showNotification(`Gagal membuang story: ${error.message}`);
     }
   }
 }

@@ -1,3 +1,4 @@
+// webpack.prod.js
 const common = require('./webpack.common.js');
 const { merge } = require('webpack-merge');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -22,6 +23,11 @@ module.exports = merge(common, {
             },
           },
         ],
+      },
+      // Add the image rule here
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        type: 'asset/resource',
       },
     ],
   },
